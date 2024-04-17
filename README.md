@@ -3,6 +3,7 @@
 #TODO
 Write documentation about:
 Django, django rest framework,
+postgres,
 pre-commit,
 coverage,
 corsheaders,
