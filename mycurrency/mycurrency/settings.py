@@ -135,6 +135,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS config
+
 CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS")
@@ -157,3 +158,14 @@ CORS_ALLOW_HEADERS = [
     "Authorization",
     "Content-Type",
 ]
+
+# Provider config
+
+FIXER_ACCESS_KEY = os.environ.get("FIXER_ACCESS_KEY")
+FIXER_API_URL = os.environ.get("FIXER_API_URL", "http://data.fixer.io/api/")
+AVAILABLE_CURRENCIES = os.environ.get(
+    "AVAILABLE_CURRENCIES", default="EUR,CHF,USD,GBP"
+).split(",")
+PROVIDER_METHODS = os.environ.get(
+    "PROVIDER_METHODS", default="rates,converter,historical"
+).split(",")

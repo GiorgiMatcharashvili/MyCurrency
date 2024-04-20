@@ -2,8 +2,12 @@ version: '3.8'
 
 services:
   web:
+    restart: on-failure
     build: .
-    command:  bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command:  bash -c "python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py loaddata default_providers.json &&
+      python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./mycurrency:/usr/src/app/
     depends_on:
