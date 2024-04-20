@@ -1,0 +1,26 @@
+[
+    {
+        "model": "mycurrency_api.Provider",
+        "pk": 1,
+        "fields": {
+            "name": "Fixer",
+            "api_url": "http://data.fixer.io/api/",
+            "endpoints": {"converter": ["convert", "access_key", "currency_from", "to", "amount"],
+              "historical": ["date", "access_key", "base"],
+              "symbols": ["symbols", "access_key"]},
+            "priority": 1
+        }
+    },
+    {
+        "model": "mycurrency_api.Provider",
+        "pk": 2,
+        "fields": {
+            "name": "Mock",
+            "api_url": "http://127.0.0.1/mock_api/",
+            "endpoints": {"converter": ["currency_from", "to", "amount"],
+              "historical": ["date", "base"],
+              "symbols": ["symbols", "access_key"]},
+            "priority": 0
+        }
+    }
+]
