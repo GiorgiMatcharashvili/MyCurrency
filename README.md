@@ -43,6 +43,13 @@ To install and run this project, follow these steps:
   ```
 - Save and close the file.
 
+5. **Build and run docker compose:**
+- Run these commands:
+  ```
+  docker-compose build
+  docker-compose up
+  ```
+
 ## Technologies
 This project utilizes the following technologies:
 
