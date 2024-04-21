@@ -16,7 +16,7 @@ Explain Drivers and providers,
 clarify "MyCurrency will work with EUR, CHF, USD, and GBP as available currencies."
 Explain Provider Model,
 Explain providers/ endpoint,
-Explain fixtures,
+Explain fixtures(fixtures in tests),
 
 Explain rates/ endpoint,
 
@@ -30,3 +30,5 @@ Explain back office, /converter and /graph endpoints.
 Explain redis and caching,
 Explain management commands used for import default cache,
 Explain what URLPathVersioning is.
+
+Explain tests and coverage on 94%.

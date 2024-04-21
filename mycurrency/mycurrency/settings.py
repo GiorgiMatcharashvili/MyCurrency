@@ -167,6 +167,7 @@ FIXER_API_URL = os.environ.get("FIXER_API_URL", "http://data.fixer.io/api/")
 AVAILABLE_CURRENCIES = os.environ.get(
     "AVAILABLE_CURRENCIES", default="EUR,CHF,USD,GBP"
 ).split(",")
+SYMBOLS = os.environ.get("SYMBOLS", default="€,₣,$,£").split(",")
 PROVIDER_METHODS = os.environ.get(
     "PROVIDER_METHODS", default="rates,converter,historical"
 ).split(",")

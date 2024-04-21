@@ -7,6 +7,7 @@ from django.core.cache import cache
 
 # Accessing an available currencies from settings
 AVAILABLE_CURRENCIES = settings.AVAILABLE_CURRENCIES
+SYMBOLS = settings.SYMBOLS
 
 ProviderAdapter = Adapter()
 
@@ -87,7 +88,11 @@ def check_currency(symbol: str) -> Currency:
         symbols = ProviderAdapter.get_currency_symbols()["symbols"]
 
         # This currency is supported
-        data = {"code": symbol, "name": symbols[symbol], "symbol": symbol}
+        data = {
+            "code": symbol,
+            "name": symbols[symbol],
+            "symbol": SYMBOLS[AVAILABLE_CURRENCIES.index(symbol)],
+        }
         serializer = CurrencySerializer(data=data)
         if serializer.is_valid():
             currency_inst = serializer.save()

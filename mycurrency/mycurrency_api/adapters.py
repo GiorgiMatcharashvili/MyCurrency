@@ -10,7 +10,7 @@ AVAILABLE_CURRENCIES = settings.AVAILABLE_CURRENCIES
 
 
 # Abstract class for provider
-class AbstractProvider(ABC):
+class AbstractAdapter(ABC):
     @abstractmethod
     def get_exchange_rate_data(
         self, source_currency: str, exchanged_currency: str, valuation_date: str
@@ -29,7 +29,7 @@ class AbstractProvider(ABC):
 
 
 # Provider Adapter class
-class Adapter(AbstractProvider):
+class Adapter(AbstractAdapter):
     def __init__(self):
         # Get active providers
         self.active_providers = Provider.objects.filter(priority__gt=0).order_by(

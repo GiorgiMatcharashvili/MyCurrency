@@ -1,0 +1,14 @@
+[
+    {
+        "model": "mycurrency_api.Provider",
+        "pk": 1,
+        "fields": {
+            "name": "Mock",
+            "api_url": "http://127.0.0.1/mock_api/",
+            "endpoints": {"converter": ["currency_from", "to", "amount"],
+              "historical": ["date", "base"],
+              "symbols": ["symbols", "access_key"]},
+            "priority": 1
+        }
+    }
+]
