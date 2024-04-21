@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # Own
     "mycurrency_api",
+    "back_office",
 ]
 
 MIDDLEWARE = [
