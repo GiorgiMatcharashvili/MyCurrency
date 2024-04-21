@@ -170,3 +170,12 @@ AVAILABLE_CURRENCIES = os.environ.get(
 PROVIDER_METHODS = os.environ.get(
     "PROVIDER_METHODS", default="rates,converter,historical"
 ).split(",")
+
+# Redis cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', '6379')}/1",
+    }
+}

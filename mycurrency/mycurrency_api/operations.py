@@ -3,6 +3,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from .adapters import Adapter
 from .serializers import CurrencySerializer, CurrencyExchangeRateSerializer
+from django.core.cache import cache
 
 # Accessing an available currencies from settings
 AVAILABLE_CURRENCIES = settings.AVAILABLE_CURRENCIES
@@ -28,6 +29,8 @@ def store_exchange_data(
 
     serializer = CurrencyExchangeRateSerializer(data=data)
     if serializer.is_valid():
+        redis_id = f"{source_currency.code}-to-{exchanged_currency.code}-{date}"
+        cache.set(redis_id, rate_value, timeout=60 * 60)
         serializer.save()
 
 
@@ -40,6 +43,15 @@ def get_exchange_data(
     using the logic that rate_value for from source to exchanged transaction is
     1/rate_value for exchanged to source transaction. Using this method we can store half as data into the database.
     """
+    # Check in the cache
+    redis_id = f"{source_currency.code}-to-{exchanged_currency.code}-{date}"
+
+    rate_value = cache.get(redis_id)
+
+    if rate_value:
+        return rate_value
+
+    # If not in cache, check in the database
     rate = CurrencyExchangeRate.objects.filter(
         source_currency=source_currency,
         exchanged_currency=exchanged_currency,
@@ -47,7 +59,7 @@ def get_exchange_data(
     )
 
     if rate.exists():
-        return float(rate.first().rate_value)
+        rate_value = float(rate.first().rate_value)
 
     reversed_rate = CurrencyExchangeRate.objects.filter(
         source_currency=exchanged_currency,
@@ -56,7 +68,12 @@ def get_exchange_data(
     )
 
     if reversed_rate.exists():
-        return float(1 / reversed_rate.first().rate_value)
+        rate_value = float(1 / reversed_rate.first().rate_value)
+
+    if rate_value:
+        # Save it in the cache
+        cache.set(redis_id, rate_value, timeout=60 * 60)
+        return rate_value
 
 
 def check_currency(symbol: str) -> Currency:
