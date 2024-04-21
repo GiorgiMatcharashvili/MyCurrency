@@ -27,4 +27,5 @@ Explain /convert and /twrr endpoints.
 
 Explain back office, /converter and /graph endpoints.
 
-Explain redis and caching.
+Explain redis and caching,
+Explain management commands used for import default cache.
