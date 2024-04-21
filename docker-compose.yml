@@ -24,6 +24,12 @@ services:
     env_file:
       - ./.env
 
+  redis:
+    restart: unless-stopped
+    image: redis:7.0.5-alpine
+    expose:
+      - "6379:6379"
+
 volumes:
   mycurrency:
   postgres_data:

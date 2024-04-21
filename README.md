@@ -23,4 +23,8 @@ Explain rates/ endpoint,
 Explain Operations,
 
 Explain CurrencyExchangeRate and Currency(I have increased name length from 20 to 50) models,
-Explain /converter and /twrr endpoints.
+Explain /convert and /twrr endpoints.
+
+Explain back office, /converter and /graph endpoints.
+
+Explain redis and caching.
