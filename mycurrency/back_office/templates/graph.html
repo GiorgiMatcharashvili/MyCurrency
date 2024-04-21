@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Rate Time Evolution Comparison</title>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #exchangeRateForm {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(244, 244, 244, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #exchangeRateForm label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #exchangeRateForm input[type="text"],
+        #exchangeRateForm input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #exchangeRateForm button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        #exchangeRateForm button.removeTargetCurrency {
+            background-color: #f44336;
+            margin-left: 10px;
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        #exchangeRateForm button.removeTargetCurrency:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #exchangeRateForm button:hover {
+            background-color: #45a049;
+        }
+
+        .targetCurrencyWrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .targetCurrency {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .removeTargetCurrency {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .removeTargetCurrency:hover {
+            background-color: #da190b;
+        }
+        button:disabled{
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        #myChart {
+            width: 400px;
+            height: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <form id="exchangeRateForm" method="post" action="">
+        {% csrf_token %}
+        <label for="sourceCurrency">Source Currency:</label>
+        <input type="text" id="sourceCurrency" name="sourceCurrency" required>
+
+        <label for="dateFrom">Date From:</label>
+        <input type="date" id="dateFrom" name="dateFrom" required>
+
+        <label for="dateTo">Date To:</label>
+        <input type="date" id="dateTo" name="dateTo" required>
+
+        <div id="targetCurrenciesWrapper">
+            <label for="targetCurrencies">Target Currencies:</label>
+            <div id="targetCurrencies">
+                <div class="targetCurrencyWrapper">
+                    <input type="text" class="targetCurrency" name="targetCurrenciesList" placeholder="Enter target currency" required>
+                    <button type="button" class="removeTargetCurrency" disabled>Remove</button>
+                </div>
+            </div>
+            <button type="button" id="addTargetCurrency">Add Target Currency</button>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('addTargetCurrency').addEventListener('click', function() {
+            var targetCurrenciesDiv = document.getElementById('targetCurrencies');
+            var currentTargetCount = targetCurrenciesDiv.children.length;
+
+            if (currentTargetCount < 8) {
+                var newDiv = document.createElement('div');
+                var newInput = document.createElement('input');
+                var removeButton = document.createElement('button');
+
+                newInput.type = 'text';
+                newInput.className = 'targetCurrency';
+                newInput.name = 'targetCurrenciesList';
+                newInput.placeholder = 'Enter target currency';
+                newInput.required = true;
+
+                removeButton.type = 'button';
+                removeButton.className = 'removeTargetCurrency';
+                removeButton.textContent = 'Remove';
+                removeButton.addEventListener('click', function() {
+                    newDiv.remove();
+                    updateAddTargetButtonState();
+                });
+
+                newDiv.className = 'targetCurrencyWrapper';
+                newDiv.appendChild(newInput);
+                newDiv.appendChild(removeButton);
+                targetCurrenciesDiv.appendChild(newDiv);
+
+                updateAddTargetButtonState();
+            }
+        });
+
+        function updateAddTargetButtonState() {
+            var targetCurrenciesDiv = document.getElementById('targetCurrencies');
+            var currentTargetCount = targetCurrenciesDiv.children.length;
+            var addTargetButton = document.getElementById('addTargetCurrency');
+
+            if (currentTargetCount >= 8) {
+                addTargetButton.disabled = true;
+            } else {
+                addTargetButton.disabled = false;
+            }
+        }
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function createChart(result) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+
+            // Extracting data from the result
+            const labels = result.labels;
+            const datasets = result.datasets.map(dataset => ({
+                label: dataset.label,
+                data: dataset.data,
+                fill: false,
+                borderColor: getRandomColor(),
+                tension: 0.1
+            }));
+
+            // Creating the chart
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        </script>
+
+    {% if 'datasets' in result and 'labels' in result %}
+        <canvas id="myChart"></canvas>
+        <script>
+            createChart(JSON.parse("{{result|escapejs}}"))
+        </script>
+    {% endif %}
+</body>
+</html>

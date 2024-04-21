@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        /* Centering the converter */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Container styles */
+        #converterContainer {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* Adjusted width */
+            width: 100%;
+        }
+
+        /* Input and button styles */
+        input[type="text"],
+        input[type="number"],
+        button {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: auto; /* Adjusted button width */
+            padding: 8px 15px; /* Adjusted button padding */
+            margin-left: 5px; /* Adjusted button margin */
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .targetCurrencyWrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .targetCurrency {
+            flex: 1;
+            margin-right: 10px; /* Adjusted margin */
+            padding: 10px; /* Adjusted padding */
+        }
+
+        .removeTargetCurrency {
+            flex-shrink: 0;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px; /* Adjusted padding */
+            margin-left: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .removeTargetCurrency:hover {
+            background-color: #da190b;
+        }
+
+        /* Disabled button styles */
+        button:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        /* Result styles */
+        .result {
+            margin-bottom: 15px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result.error {
+            background-color: #ffe6e6;
+        }
+
+        .result.success {
+            background-color: #e6ffe6;
+        }
+
+        .result p {
+            margin: 5px 0;
+        }
+
+        .error {
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="converterContainer">
+        <h1 style="text-align: center;">Currency Converter</h1>
+        <form id="converterForm" method="post" action="">
+            {% csrf_token %}
+            <label for="sourceCurrency">Source Currency:</label>
+            <input type="text" id="sourceCurrency" name="sourceCurrency" required>
+            <br>
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" min="0.01" step="0.01" required>
+            <br>
+            <div id="targetCurrenciesWrapper">
+                <label for="targetCurrencies">Target Currencies:</label>
+                <div id="targetCurrencies">
+                    <div class="targetCurrencyWrapper">
+                        <input type="text" class="targetCurrency" name="targetCurrenciesList" placeholder="Enter target currency" required>
+                        <button type="button" class="removeTargetCurrency">Remove</button>
+                    </div>
+                </div>
+                <button type="button" id="addTargetCurrency">Add Target Currency</button>
+            </div>
+            <br>
+            <button type="submit" style="width: 100%;">Convert</button>
+        </form>
+
+        <div id="result">
+            {% if result %}
+                {% for currency, data in result.items %}
+                    <div class="result">
+                        <p>Source Currency: {{ data.source_currency }}</p>
+                        <p>Target Currency: {{ data.exchanged_currency }}</p>
+                        {% if data.error %}
+                            <p class="error">{{ data.error }}</p>
+                        {% else %}
+                            <p>Rate: {{ data.rate }}</p>
+                            <p>Initial Amount: {{ data.initial_amount }}</p>
+                            <p>Result: {{ data.result }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addTargetCurrency').addEventListener('click', function() {
+            var targetCurrenciesDiv = document.getElementById('targetCurrencies');
+            var currentTargetCount = targetCurrenciesDiv.children.length;
+
+            if (currentTargetCount < 8) {
+                var newDiv = document.createElement('div');
+                var newInput = document.createElement('input');
+                var removeButton = document.createElement('button');
+
+                newInput.type = 'text';
+                newInput.className = 'targetCurrency';
+                newInput.name = 'targetCurrenciesList';
+                newInput.placeholder = 'Enter target currency';
+                newInput.required = true;
+
+                removeButton.type = 'button';
+                removeButton.className = 'removeTargetCurrency';
+                removeButton.textContent = 'Remove';
+                removeButton.addEventListener('click', function() {
+                    newDiv.remove();
+                    updateAddTargetButtonState();
+                });
+
+                newDiv.className = 'targetCurrencyWrapper';
+                newDiv.appendChild(newInput);
+                newDiv.appendChild(removeButton);
+                targetCurrenciesDiv.appendChild(newDiv);
+
+                updateAddTargetButtonState();
+            }
+        });
+
+        function updateAddTargetButtonState() {
+            var targetCurrenciesDiv = document.getElementById('targetCurrencies');
+            var currentTargetCount = targetCurrenciesDiv.children.length;
+            var addTargetButton = document.getElementById('addTargetCurrency');
+
+            if (currentTargetCount >= 8) {
+                addTargetButton.disabled = true;
+            } else {
+                addTargetButton.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
