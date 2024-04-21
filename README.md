@@ -8,7 +8,6 @@ With support for EUR, CHF, USD, and GBP as available currencies, MyCurrency offe
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage](#usage)
 - [Technologies](#Technologies)
 - [Endpoints](#Endpoints)
 - [Drivers](#Drivers)
